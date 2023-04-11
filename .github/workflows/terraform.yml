@@ -1,20 +1,26 @@
 name: Create Resource Group
 
-on:
-  push:
-    branches:
-      - main
+on: [push]
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
 jobs:
   create-resource-group:
     runs-on: ubuntu-latest
     steps:
-    - uses: azure/login@v1
+    - uses: actions/checkout@v2
+    - uses: Azure/login@v1
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    - name: Azure CLI Login
-      run: az login
+        terraform_version: 1.0.8
     - name: Terraform Init
       run: terraform init
+    - name: Terraform Plan
+      run: terraform plan
     - name: Terraform Apply
       run: terraform apply -auto-approve
